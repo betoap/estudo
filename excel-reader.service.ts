@@ -163,3 +163,36 @@ Exemplo de retorno
 }
 
 */
+
+// ======================================================
+// PARSE "H12-H300" OU "H12"
+// ======================================================
+private parseInterval(interval: string): {
+  col: string;
+  start: number;
+  end: number;
+} {
+
+  // Caso 1: intervalo (ex: H12-H300)
+  const rangeMatch = interval.match(/^([A-Z]+)(\d+)-\1(\d+)$/i);
+  if (rangeMatch) {
+    return {
+      col: rangeMatch[1].toUpperCase(),
+      start: Number(rangeMatch[2]),
+      end: Number(rangeMatch[3])
+    };
+  }
+
+  // Caso 2: célula única (ex: H2)
+  const singleMatch = interval.match(/^([A-Z]+)(\d+)$/i);
+  if (singleMatch) {
+    const row = Number(singleMatch[2]);
+    return {
+      col: singleMatch[1].toUpperCase(),
+      start: row,
+      end: row
+    };
+  }
+
+  throw new Error(`Intervalo inválido: ${interval}`);
+}
