@@ -196,3 +196,24 @@ private parseInterval(interval: string): {
 
   throw new Error(`Intervalo inválido: ${interval}`);
 }
+
+
+
+
+for (const intervalo of intervalos) {
+  const { col, start, end } = this.parseInterval(intervalo);
+
+  // 🔧 NÃO sobrescreve mais
+  if (!resultado[col]) {
+    resultado[col] = {};
+  }
+
+  for (let row = start; row <= end; row++) {
+    const ref = `${col}${row}`;
+    resultado[col][row] = this.getCellValue(
+      sheetXml,
+      ref,
+      sharedStrings
+    );
+  }
+}
