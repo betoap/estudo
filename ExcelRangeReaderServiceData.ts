@@ -12,20 +12,16 @@ export type IntervalosResultado = {
 })
 export class ExcelReaderService {
 
-  // ======================================================
-  // API PÚBLICA
-  // ======================================================
   async lerIntervalos(
     file: ArrayBuffer,
-    aba: number,              // 1 = primeira aba, 2 = segunda...
-    intervalos: string[]      // ex: ["H12-H300", "I10-I20", "H2"]
+    aba: number,
+    intervalos: string[]
   ): Promise<IntervalosResultado> {
 
     const zip = await JSZip.loadAsync(file);
 
     const sheetPath = `xl/worksheets/sheet${aba}.xml`;
     const sheetXml = await zip.file(sheetPath)?.async('string');
-
     if (!sheetXml) {
       throw new Error(`Aba ${aba} não encontrada (${sheetPath})`);
     }
@@ -33,15 +29,18 @@ export class ExcelReaderService {
     const sharedStringsXml = await zip
       .file('xl/sharedStrings.xml')!
       .async('string');
-
     const sharedStrings = this.parseSharedStrings(sharedStringsXml);
+
+    const stylesXml = await zip
+      .file('xl/styles.xml')!
+      .async('string');
+    const styles = this.parseStyles(stylesXml);
 
     const resultado: IntervalosResultado = {};
 
     for (const intervalo of intervalos) {
       const { col, start, end } = this.parseInterval(intervalo);
 
-      // 🔧 NÃO sobrescreve mais colunas existentes
       if (!resultado[col]) {
         resultado[col] = {};
       }
@@ -51,7 +50,8 @@ export class ExcelReaderService {
         resultado[col][row] = this.getCellValue(
           sheetXml,
           ref,
-          sharedStrings
+          sharedStrings,
+          styles
         );
       }
     }
@@ -59,9 +59,6 @@ export class ExcelReaderService {
     return resultado;
   }
 
-  // ======================================================
-  // LÊ UMA CÉLULA
-  // ======================================================
   private getCellValue(
     sheetXml: string,
     cellRef: string,
@@ -79,7 +76,6 @@ export class ExcelReaderService {
     const attrs = match[1];
     const innerXml = match[2];
 
-    // Shared string
     if (/t="s"/.test(attrs)) {
       const v = innerXml.match(/<v>(\d+)<\/v>/);
       return v ? sharedStrings[Number(v[1])] ?? null : null;
@@ -91,7 +87,6 @@ export class ExcelReaderService {
     const raw = Number(v[1]);
     if (isNaN(raw)) return v[1];
 
-    // 🎯 Estilo da célula
     const styleMatch = attrs.match(/s="(\d+)"/);
     if (!styleMatch) return raw;
 
@@ -103,19 +98,14 @@ export class ExcelReaderService {
       return this.excelDateToString(raw);
     }
 
-    // 📊 PERCENTUAL
+    // 📊 PERCENTUAL → mantém 0.01
     if ([9, 10].includes(numFmtId)) {
       return raw;
     }
 
-    // 💰 MOEDA / NÚMERO
     return raw;
   }
 
-
-  // ======================================================
-  // PARSE sharedStrings.xml
-  // ======================================================
   private parseSharedStrings(xml: string): string[] {
     const result: string[] = [];
     const regex = /<si>[\s\S]*?<t[^>]*>([\s\S]*?)<\/t>[\s\S]*?<\/si>/g;
@@ -124,20 +114,26 @@ export class ExcelReaderService {
     while ((match = regex.exec(xml))) {
       result.push(match[1]);
     }
-
     return result;
   }
 
-  // ======================================================
-  // PARSE "H12-H300" ou "H2"
-  // ======================================================
+  private parseStyles(xml: string): number[] {
+    const styles: number[] = [];
+    const xfRegex = /<xf[^>]*numFmtId="(\d+)"[^>]*>/g;
+
+    let match: RegExpExecArray | null;
+    while ((match = xfRegex.exec(xml))) {
+      styles.push(Number(match[1]));
+    }
+    return styles;
+  }
+
   private parseInterval(interval: string): {
     col: string;
     start: number;
     end: number;
   } {
 
-    // Caso 1: intervalo (ex: H12-H300)
     const rangeMatch = interval.match(/^([A-Z]+)(\d+)-\1(\d+)$/i);
     if (rangeMatch) {
       return {
@@ -147,7 +143,6 @@ export class ExcelReaderService {
       };
     }
 
-    // Caso 2: célula única (ex: H2)
     const singleMatch = interval.match(/^([A-Z]+)(\d+)$/i);
     if (singleMatch) {
       const row = Number(singleMatch[2]);
@@ -161,11 +156,8 @@ export class ExcelReaderService {
     throw new Error(`Intervalo inválido: ${interval}`);
   }
 
-  // ======================================================
-  // CONVERTE DATA DO EXCEL (1900-based) → dd/MM/yyyy
-  // ======================================================
   private excelDateToString(serial: number): string {
-    const excelEpoch = new Date(1899, 11, 30); // Excel base
+    const excelEpoch = new Date(1899, 11, 30);
     const date = new Date(excelEpoch.getTime() + serial * 86400000);
 
     const dd = String(date.getDate()).padStart(2, '0');
