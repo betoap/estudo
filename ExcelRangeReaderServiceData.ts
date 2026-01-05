@@ -10,7 +10,7 @@ export type IntervalosResultado = {
 @Injectable({
   providedIn: 'root'
 })
-export class ExcelRangeReaderService {
+export class ExcelReaderService {
 
   // ======================================================
   // API PÚBLICA
@@ -65,46 +65,53 @@ export class ExcelRangeReaderService {
   private getCellValue(
     sheetXml: string,
     cellRef: string,
-    sharedStrings: string[]
+    sharedStrings: string[],
+    styles: number[]
   ): string | number | null {
 
     const cellRegex = new RegExp(
-      `<c[^>]*r="${cellRef}"[^>]*>([\\s\\S]*?)<\\/c>`
+      `<c[^>]*r="${cellRef}"([^>]*)>([\\s\\S]*?)<\\/c>`
     );
 
     const match = sheetXml.match(cellRegex);
     if (!match) return null;
 
-    const fullCell = match[0];
-    const innerXml = match[1];
+    const attrs = match[1];
+    const innerXml = match[2];
 
-    // ============================
-    // Texto compartilhado
-    // ============================
-    if (/t="s"/.test(fullCell)) {
+    // Shared string
+    if (/t="s"/.test(attrs)) {
       const v = innerXml.match(/<v>(\d+)<\/v>/);
       return v ? sharedStrings[Number(v[1])] ?? null : null;
     }
 
-    // ============================
-    // Número / Data / Fórmula
-    // ============================
     const v = innerXml.match(/<v>([\s\S]*?)<\/v>/);
     if (!v) return null;
 
-    const raw = v[1];
-    const num = Number(raw);
+    const raw = Number(v[1]);
+    if (isNaN(raw)) return v[1];
 
-    if (!isNaN(num)) {
-      // 🟡 Se tiver style, pode ser data
-      if (/s="\d+"/.test(fullCell)) {
-        return this.excelDateToString(num);
-      }
-      return num;
+    // 🎯 Estilo da célula
+    const styleMatch = attrs.match(/s="(\d+)"/);
+    if (!styleMatch) return raw;
+
+    const styleIndex = Number(styleMatch[1]);
+    const numFmtId = styles[styleIndex];
+
+    // 📅 DATA
+    if ([14, 15, 16, 17, 22].includes(numFmtId)) {
+      return this.excelDateToString(raw);
     }
 
+    // 📊 PERCENTUAL
+    if ([9, 10].includes(numFmtId)) {
+      return raw;
+    }
+
+    // 💰 MOEDA / NÚMERO
     return raw;
   }
+
 
   // ======================================================
   // PARSE sharedStrings.xml
