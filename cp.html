@@ -253,3 +253,123 @@
     </section>
   </ng-template>
 </section>
+
+
+
+
+
+
+
+
+
+
+
+<section class="offer-list-shell">
+  <header class="offer-list-header">
+    <h2>{{ title }}</h2>
+  </header>
+
+  <ng-container *ngIf="offers?.length; else emptyState">
+
+    <!-- NEGOCIADAS -->
+    <section class="offer-section" *ngIf="negotiatedOffers.length">
+      <div class="section-header">
+        <h3>Negociadas</h3>
+        <p>
+          Preços diferenciados aprovados no sistema Visão Cliente. Não podem ter alteração e seguem para a formalização do cliente, sem aprovações da mesa de crédito.
+        </p>
+      </div>
+
+      <div class="offer-cards">
+        <article class="offer-card" *ngFor="let offer of negotiatedOffers; trackBy: trackOffer">
+          <div class="offer-card__content">
+
+            <div class="offer-card__identity">
+              <span class="offer-badge offer-badge--negotiated">{{ offer.badge }}</span>
+              <h4>{{ offer.title }}</h4>
+              <p>Percentual da garantia: {{ offer.guaranteePercentage }}</p>
+            </div>
+
+            <div class="offer-card__column">
+              <span class="label">Disponibilidade</span>
+              <strong>{{ offer.availability }}</strong>
+
+              <span class="label">Prazo do contrato</span>
+              <span>{{ offer.contractTerm }}</span>
+
+              <span class="label" *ngIf="offer.insurance">Seguro</span>
+              <span *ngIf="offer.insurance">{{ offer.insurance }}</span>
+            </div>
+
+            <div class="offer-card__column">
+              <span class="label" *ngIf="offer.firstInstallmentDate">Data da 1ª parcela</span>
+              <span *ngIf="offer.firstInstallmentDate">{{ offer.firstInstallmentDate }}</span>
+
+              <span class="label" *ngIf="offer.annualSpread">Spread ao ano</span>
+              <span *ngIf="offer.annualSpread">{{ offer.annualSpread }}</span>
+
+              <span class="label" *ngIf="offer.interestRate">Taxa de juros</span>
+              <span *ngIf="offer.interestRate">{{ offer.interestRate }}</span>
+            </div>
+          </div>
+
+          <div class="offer-card__action">
+            <button class="offer-button offer-button--primary" type="button">
+              {{ offer.actionLabel }}
+            </button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- PRÉ-APROVADAS -->
+    <section class="offer-section" *ngIf="preApprovedOffers.length">
+      <div class="section-header">
+        <h3>Pré-aprovadas</h3>
+        <p>
+          Escolha a garantia e comece uma simulação. Ofertas pré-aprovadas podem passar por mais etapas de aprovação e isso pode impactar o tempo de contratação.
+        </p>
+      </div>
+
+      <div class="offer-cards">
+        <article class="offer-card" *ngFor="let offer of preApprovedOffers; trackBy: trackOffer">
+          <div class="offer-card__content">
+
+            <div class="offer-card__identity">
+              <span class="offer-badge offer-badge--preapproved">{{ offer.badge }}</span>
+              <h4>{{ offer.title }}</h4>
+              <p>Percentual da garantia: {{ offer.guaranteePercentage }}</p>
+            </div>
+
+            <div class="offer-card__column">
+              <span class="label">Disponibilidade</span>
+              <strong>{{ offer.availability }}</strong>
+
+              <span class="label">Prazo do contrato</span>
+              <span>{{ offer.contractTerm }}</span>
+            </div>
+
+            <div class="offer-card__column" *ngIf="offer.additionalLabel || offer.additionalValue">
+              <span class="label">{{ offer.additionalLabel }}</span>
+              <span>{{ offer.additionalValue }}</span>
+            </div>
+          </div>
+
+          <div class="offer-card__action">
+            <button class="offer-button offer-button--outline" type="button">
+              {{ offer.actionLabel }}
+            </button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+  </ng-container>
+
+  <ng-template #emptyState>
+    <section class="offer-empty">
+      <h3>Nenhuma oferta encontrada</h3>
+      <p>No momento não existem ofertas para exibir.</p>
+    </section>
+  </ng-template>
+</section>
