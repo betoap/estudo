@@ -1,0 +1,83 @@
+<section class="offer-list-shell">
+                    @if (offer.subtitle) {
+                      <p class="offer-subtitle">{{ offer.subtitle }}</p>
+                    }
+                  </div>
+
+                  <div class="offer-card__availability">
+                    @if (offer.availabilityLabel) {
+                      <span class="offer-label">{{ offer.availabilityLabel }}</span>
+                    }
+                    @if (offer.highlightValue) {
+                      <strong class="offer-highlight">{{ offer.highlightValue }}</strong>
+                    }
+                    @if (offer.contractLabel && offer.contractValue) {
+                      <div class="offer-detail-line">
+                        <span class="offer-label">{{ offer.contractLabel }}</span>
+                        <span>{{ offer.contractValue }}</span>
+                      </div>
+                    }
+
+                    @if (offer.secondaryInfo?.length) {
+                      <div class="offer-stack">
+                        @for (item of offer.secondaryInfo; track item.label) {
+                          <div class="offer-detail-line" [class.offer-detail-line--muted]="item.muted">
+                            <span class="offer-label">{{ item.label }}</span>
+                            <span>
+                              @if (item.icon) {
+                                <span class="detail-icon">{{ item.icon }}</span>
+                              }
+                              {{ item.value }}
+                            </span>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+
+                  <div class="offer-card__meta">
+                    @if (offer.rightInfo?.length) {
+                      <div class="offer-stack">
+                        @for (item of offer.rightInfo; track item.label) {
+                          <div class="offer-detail-line" [class.offer-detail-line--muted]="item.muted">
+                            <span class="offer-label">{{ item.label }}</span>
+                            <span>
+                              @if (item.icon) {
+                                <span class="detail-icon">{{ item.icon }}</span>
+                              }
+                              {{ item.value }}
+                            </span>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <div class="offer-card__action">
+                  <button
+                    type="button"
+                    class="offer-button"
+                    [disabled]="offer.disabled"
+                    [ngClass]="{
+                      'offer-button--primary': (offer.actionVariant ?? 'primary') === 'primary',
+                      'offer-button--outline': (offer.actionVariant ?? 'primary') === 'outline'
+                    }"
+                    (click)="onAction(offer)"
+                  >
+                    {{ offer.actionLabel }}
+                  </button>
+                </div>
+              </article>
+            }
+          </div>
+        </section>
+      }
+    </div>
+  } @else {
+    <section class="offer-empty">
+      <h3>{{ emptyTitle }}</h3>
+      <p>{{ emptyDescription }}</p>
+    </section>
+  }
+</section>
