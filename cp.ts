@@ -59,3 +59,16 @@ get negotiatedOffers(): OfferItem[] {
 get preApprovedOffers(): OfferItem[] {
   return this.offers.filter(item => item.type === 'preApproved');
 }
+
+
+get negotiatedOffers(): OfferItem[] {
+    return this.offers.filter(item => item.type === 'negotiated');
+  }
+
+  get preApprovedOffers(): OfferItem[] {
+    return this.offers.filter(item => item.type === 'preApproved');
+  }
+
+  trackOffer(index: number, offer: OfferItem): number | string {
+    return offer.id;
+  }
