@@ -1,42 +1,103 @@
 <section class="offer-list-shell">
+  <header class="offer-list-header">
+    <h2>{{ title }}</h2>
+  </header>
 
-                <div class="offer-detail-line" *ngIf="offer.contractLabel && offer.contractValue">
+  <ng-container *ngIf="sections.length; else emptyState">
+    <div class="offer-sections">
+
+      <section class="offer-section" *ngFor="let section of sections; trackBy: trackSection">
+
+        <div class="section-header">
+          <h3>{{ section.title }}</h3>
+          <p *ngIf="section.description">{{ section.description }}</p>
+        </div>
+
+        <div class="offer-cards">
+
+          <article class="offer-card" *ngFor="let offer of section.offers; trackBy: trackOffer">
+
+            <div class="offer-card__main">
+
+              <!-- IDENTIDADE -->
+              <div class="offer-card__identity">
+
+                <span
+                  *ngIf="offer.badge"
+                  class="offer-badge"
+                  [ngClass]="{
+                    'offer-badge--negotiated': section.type === 'negotiated',
+                    'offer-badge--preapproved': section.type === 'preApproved'
+                  }"
+                >
+                  {{ offer.badge }}
+                </span>
+
+                <div class="offer-title-row">
+                  <span *ngIf="offer.icon" class="offer-icon">{{ offer.icon }}</span>
+                  <h4>{{ offer.title }}</h4>
+                </div>
+
+                <p *ngIf="offer.subtitle" class="offer-subtitle">
+                  {{ offer.subtitle }}
+                </p>
+
+              </div>
+
+              <!-- DISPONIBILIDADE -->
+              <div class="offer-card__availability">
+
+                <span *ngIf="offer.availabilityLabel" class="offer-label">
+                  {{ offer.availabilityLabel }}
+                </span>
+
+                <strong *ngIf="offer.highlightValue" class="offer-highlight">
+                  {{ offer.highlightValue }}
+                </strong>
+
+                <div *ngIf="offer.contractLabel && offer.contractValue" class="offer-detail-line">
                   <span class="offer-label">{{ offer.contractLabel }}</span>
                   <span>{{ offer.contractValue }}</span>
                 </div>
 
-                <div class="offer-stack" *ngIf="offer.secondaryInfo?.length">
+                <div *ngIf="offer.secondaryInfo?.length" class="offer-stack">
                   <div
-                    class="offer-detail-line"
                     *ngFor="let item of offer.secondaryInfo"
+                    class="offer-detail-line"
                     [class.offer-detail-line--muted]="item.muted"
                   >
                     <span class="offer-label">{{ item.label }}</span>
                     <span>
-                      <span class="detail-icon" *ngIf="item.icon">{{ item.icon }}</span>
+                      <span *ngIf="item.icon" class="detail-icon">{{ item.icon }}</span>
                       {{ item.value }}
                     </span>
                   </div>
                 </div>
+
               </div>
 
+              <!-- META -->
               <div class="offer-card__meta">
-                <div class="offer-stack" *ngIf="offer.rightInfo?.length">
+
+                <div *ngIf="offer.rightInfo?.length" class="offer-stack">
                   <div
-                    class="offer-detail-line"
                     *ngFor="let item of offer.rightInfo"
+                    class="offer-detail-line"
                     [class.offer-detail-line--muted]="item.muted"
                   >
                     <span class="offer-label">{{ item.label }}</span>
                     <span>
-                      <span class="detail-icon" *ngIf="item.icon">{{ item.icon }}</span>
+                      <span *ngIf="item.icon" class="detail-icon">{{ item.icon }}</span>
                       {{ item.value }}
                     </span>
                   </div>
                 </div>
+
               </div>
+
             </div>
 
+            <!-- AÇÃO -->
             <div class="offer-card__action">
               <button
                 type="button"
@@ -51,9 +112,13 @@
                 {{ offer.actionLabel }}
               </button>
             </div>
+
           </article>
+
         </div>
+
       </section>
+
     </div>
   </ng-container>
 
@@ -63,4 +128,5 @@
       <p>{{ emptyDescription }}</p>
     </section>
   </ng-template>
+
 </section>
