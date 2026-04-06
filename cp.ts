@@ -1,4 +1,4 @@
-readonly sections = signal<OfferSection[]>([
+sections: OfferSection[] = [
     {
       type: 'negotiated',
       title: 'Negociadas',
@@ -58,26 +58,6 @@ readonly sections = signal<OfferSection[]>([
           actionLabel: 'Simular',
           actionVariant: 'outline',
         },
-        {
-          id: 3,
-          badge: 'Pré-aprovado',
-          title: 'Aplicação Financeira',
-          subtitle: 'Percentual da garantia: 100%',
-          icon: '≋',
-          availabilityLabel: 'Disponibilidade',
-          highlightValue: 'R$ 230.000,00',
-          contractLabel: 'Prazo do contrato',
-          contractValue: 'Entre 6 e 60 meses',
-          rightInfo: [
-            {
-              label: 'Investimentos',
-              value: 'Dos sócios e da empresa, exceto conta conjunta',
-            },
-          ],
-          actionLabel: 'Simular',
-          actionVariant: 'outline',
-        },
       ],
     },
-  ]);
-}
+  ];
