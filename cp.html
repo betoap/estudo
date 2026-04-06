@@ -1,83 +1,66 @@
 <section class="offer-list-shell">
-                    @if (offer.subtitle) {
-                      <p class="offer-subtitle">{{ offer.subtitle }}</p>
-                    }
-                  </div>
 
-                  <div class="offer-card__availability">
-                    @if (offer.availabilityLabel) {
-                      <span class="offer-label">{{ offer.availabilityLabel }}</span>
-                    }
-                    @if (offer.highlightValue) {
-                      <strong class="offer-highlight">{{ offer.highlightValue }}</strong>
-                    }
-                    @if (offer.contractLabel && offer.contractValue) {
-                      <div class="offer-detail-line">
-                        <span class="offer-label">{{ offer.contractLabel }}</span>
-                        <span>{{ offer.contractValue }}</span>
-                      </div>
-                    }
-
-                    @if (offer.secondaryInfo?.length) {
-                      <div class="offer-stack">
-                        @for (item of offer.secondaryInfo; track item.label) {
-                          <div class="offer-detail-line" [class.offer-detail-line--muted]="item.muted">
-                            <span class="offer-label">{{ item.label }}</span>
-                            <span>
-                              @if (item.icon) {
-                                <span class="detail-icon">{{ item.icon }}</span>
-                              }
-                              {{ item.value }}
-                            </span>
-                          </div>
-                        }
-                      </div>
-                    }
-                  </div>
-
-                  <div class="offer-card__meta">
-                    @if (offer.rightInfo?.length) {
-                      <div class="offer-stack">
-                        @for (item of offer.rightInfo; track item.label) {
-                          <div class="offer-detail-line" [class.offer-detail-line--muted]="item.muted">
-                            <span class="offer-label">{{ item.label }}</span>
-                            <span>
-                              @if (item.icon) {
-                                <span class="detail-icon">{{ item.icon }}</span>
-                              }
-                              {{ item.value }}
-                            </span>
-                          </div>
-                        }
-                      </div>
-                    }
-                  </div>
+                <div class="offer-detail-line" *ngIf="offer.contractLabel && offer.contractValue">
+                  <span class="offer-label">{{ offer.contractLabel }}</span>
+                  <span>{{ offer.contractValue }}</span>
                 </div>
 
-                <div class="offer-card__action">
-                  <button
-                    type="button"
-                    class="offer-button"
-                    [disabled]="offer.disabled"
-                    [ngClass]="{
-                      'offer-button--primary': (offer.actionVariant ?? 'primary') === 'primary',
-                      'offer-button--outline': (offer.actionVariant ?? 'primary') === 'outline'
-                    }"
-                    (click)="onAction(offer)"
+                <div class="offer-stack" *ngIf="offer.secondaryInfo?.length">
+                  <div
+                    class="offer-detail-line"
+                    *ngFor="let item of offer.secondaryInfo"
+                    [class.offer-detail-line--muted]="item.muted"
                   >
-                    {{ offer.actionLabel }}
-                  </button>
+                    <span class="offer-label">{{ item.label }}</span>
+                    <span>
+                      <span class="detail-icon" *ngIf="item.icon">{{ item.icon }}</span>
+                      {{ item.value }}
+                    </span>
+                  </div>
                 </div>
-              </article>
-            }
-          </div>
-        </section>
-      }
+              </div>
+
+              <div class="offer-card__meta">
+                <div class="offer-stack" *ngIf="offer.rightInfo?.length">
+                  <div
+                    class="offer-detail-line"
+                    *ngFor="let item of offer.rightInfo"
+                    [class.offer-detail-line--muted]="item.muted"
+                  >
+                    <span class="offer-label">{{ item.label }}</span>
+                    <span>
+                      <span class="detail-icon" *ngIf="item.icon">{{ item.icon }}</span>
+                      {{ item.value }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="offer-card__action">
+              <button
+                type="button"
+                class="offer-button"
+                [disabled]="offer.disabled"
+                [ngClass]="{
+                  'offer-button--primary': (offer.actionVariant || 'primary') === 'primary',
+                  'offer-button--outline': (offer.actionVariant || 'primary') === 'outline'
+                }"
+                (click)="onAction(offer)"
+              >
+                {{ offer.actionLabel }}
+              </button>
+            </div>
+          </article>
+        </div>
+      </section>
     </div>
-  } @else {
+  </ng-container>
+
+  <ng-template #emptyState>
     <section class="offer-empty">
       <h3>{{ emptyTitle }}</h3>
       <p>{{ emptyDescription }}</p>
     </section>
-  }
+  </ng-template>
 </section>
